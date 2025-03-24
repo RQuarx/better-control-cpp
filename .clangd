@@ -1,0 +1,40 @@
+InlayHints:
+  ParameterNames: No
+  Designators: No
+
+CompileFlags:
+  Add: [--std=c++23, -I=inc/, -Xclang, -fixit]
+  Compiler: clang++
+
+Diagnostics:
+  ClangTidy:
+    Add: [
+      'bugprone-*',
+      'modernize-*',
+      'readability-*',
+      'performance-*',
+      'cppcoreguidelines-*',
+      'misc-*',
+      'google-*'
+    ]
+    Remove: [
+      'readability-identifier-length',
+      'readability-braces-around-statements',
+      'bugprone-narrowing-conversions',
+      'bugprone-easily-swappable-parameters',
+      'modernize-use-designated-initializers',
+      'readability-magic-numbers',
+      'cppcoreguidelines-pro-type-cstyle-cast',
+      'misc-non-private-member-variables-in-classes',
+      'cppcoreguidelines-pro-type-reinterpret-cast',
+      'cppcoreguidelines-narrowing-conversions'
+    ]
+    CheckOptions:
+      readability-identifier-naming.VariableCase: pascal_case
+    FastCheckFilter: Strict
+
+Completion:
+  AllScopes: Yes
+
+Hover:
+  ShowAKA: Ye

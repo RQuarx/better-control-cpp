@@ -1,17 +1,20 @@
-PREFIX ?= /usr
-BIN_DIR := $(PREFIX)/bin
-DESKTOP_DIR := $(PREFIX)/share/applications
-APP_NAME := control
-SRC := src/control.py
+CXX = clang++
+CXXFlags = -O3 -Wall -Wextra -std=c++23
+Deps = -lgtkmm-3 -ljsoncpp -lnm
 
-install: build
-	install -Dm755 $(SRC) $(BIN_DIR)/$(APP_NAME)
-	install -Dm644 src/control.desktop $(DESKTOP_DIR)/control.desktop
-	@echo "Better Control installed successfully!"
+SRC = src/*.cpp
+INC_DIR = inc/
 
-uninstall:
-	rm -f $(BIN_DIR)/$(APP_NAME)
-	rm -f $(DESKTOP_DIR)/control.desktop
-	@echo "Better Control uninstalled successfully!"
+OUT_DIR
+OUT = $(OUT_DIR)/better-control
 
-.PHONY: install uninstall build
+$(shell mkdir -p $(OUT_DIR))
+
+all: $(OUT)
+
+$(OUT): $(SRC)
+	$(CXX) $(CXXFlags) $(Deps) $^ -o $@
+clean:
+	rm $(OUT)
+
+.PHONY: all clean
