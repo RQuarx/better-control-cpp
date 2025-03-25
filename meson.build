@@ -19,6 +19,8 @@ source = files(
     'src/main.cpp',
     'src/arg_parse.cpp',
     'src/window.cpp',
+    'src/logger.cpp',
+    'src/utils.cpp',
 )
 
 deps = [

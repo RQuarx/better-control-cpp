@@ -1,13 +1,16 @@
 #include "../inc/arg_parse.hpp"
+#include "glibmm/thread.h"
 
+#include <cstdio>
 #include <cstdlib>
 #include <string>
 #include <print>
+#include <string_view>
 
 
 ArgParser::ArgParser(int32_t argc, char **argv)
 {
-    arg_list = std::vector<std::string_view>(std::next(argv, 1), std::next(argv, argc));
+    arg_list = std::vector<std::string_view>(argv, std::next(argv, argc));
 }
 
 
@@ -26,27 +29,29 @@ ArgParser::find_arg(ArgInput arg) -> bool
 auto
 ArgParser::option_arg(std::string &option, ArgInput arg) -> bool
 {
-    auto iter = std::ranges::find(this->arg_list, arg.short_arg);
-    auto iter_one = iter++;
+    for (size_t i = 1; i < arg_list.size(); i++) {
+        std::string_view current_arg = arg_list.at(i);
+        size_t eq_index = current_arg.find('=');
 
-    if (iter != this->arg_list.end() && iter_one != this->arg_list.end()) {
-        option = *iter;
-        this->arg_list.erase(iter);
-        return true;
-    }
+        if (eq_index != std::string_view::npos) {
+            current_arg = current_arg.substr(0, eq_index);
+        }
 
-    if (!arg.long_arg.empty()) {
-        iter = std::ranges::find(this->arg_list, arg.long_arg);
-        iter_one = iter++;
+        if (current_arg != arg.short_arg && current_arg != arg.long_arg) continue;
 
-        if (iter != this->arg_list.end() && iter_one != this->arg_list.end()) {
-            this->arg_list.erase(iter);
-            option = *iter;
+        if (eq_index != std::string_view::npos) {
+            option = current_arg.substr(eq_index + 1);
             return true;
         }
-    }
 
-    option.clear();
+        if (i + 1 < arg_list.size()) {
+            std::string_view next_arg = arg_list.at(i + 1);
+            if (!next_arg.starts_with('-')) {
+                option = next_arg;
+                return true;
+            }
+        }
+    }
     return false;
 }
 
@@ -56,5 +61,5 @@ ArgParser::print_help_message(FILE *stream)
 {
     std::println(stream, "Usage: {} <options>\n", arg_list.at(0));
     std::println(stream, "Options:");
-    exit(EXIT_SUCCESS);
+    exit(stream == stderr ? EXIT_FAILURE : EXIT_SUCCESS);
 }
