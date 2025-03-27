@@ -63,9 +63,9 @@ private:
 
     std::unordered_map<LogLevel, std::pair<const char *, const char *>> labels = {
         { Warn, { "\e[1;37m[\e[1;33mWARNING\e[1;37m]:\e[0;0;0m", "[WARNING]:" } },
-        { Error, { "\e[1;37m[\e[1;31mERROR\e[1;37m]:\e[0;0;0m", "[ERROR]:" } },
-        { Debug, { "\e[1;37m[\e[1;36mDEBUG\e[1;37m]:\e[0;0;0m", "[DEBUG]:" } },
-        { Info, { "\e[1;37m[\e[1;32mINFO\e[1;37m]:\e[0;0;0m", "[INFO]:" } },
+        { Error, { "\e[1;37m[\e[1;31mERROR\e[1;37m]:\e[0;0;0m ", "[ERROR]: " } },
+        { Debug, { "\e[1;37m[\e[1;36mDEBUG\e[1;37m]:\e[0;0;0m ", "[DEBUG]: " } },
+        { Info, { "\e[1;37m[\e[1;32mINFO\e[1;37m]:\e[0;0;0m  ", "[INFO]:  " } },
     };
 
     void

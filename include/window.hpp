@@ -7,22 +7,23 @@
 
 #include <gtkmm-3.0/gtkmm.h>
 
-
-enum Tabs : uint8_t {
-    Wifi,
-    Bluetooth,
-    Display,
-    Battery,
-    Volume
-};
+#include "logger.hpp"
 
 
 class
 BetterControl : public Gtk::Window
 {
 public:
+    enum Types : uint8_t {
+        Wifi,
+        Bluetooth,
+        Display,
+        Battery,
+        Volume
+    };
+
     BetterControl(
-        const char *window_title, std::pair<int32_t, int32_t> window_size
+        Logger *logger, ArgParser *arg_parse, const char *window_title, std::pair<int32_t, int32_t> window_size
     );
     ~BetterControl();
     BetterControl(const BetterControl &) = delete;
@@ -31,8 +32,10 @@ public:
     auto operator=(BetterControl &&) -> BetterControl & = delete;
 
 private:
-    std::vector<Tabs> tabs;
+    std::vector<Types> tabs;
+    Logger *logger;
 
+protected:
     static void on_tab_switch(GtkNotebook *notebook, GtkWidget *page, guint page_num, gpointer user_data);
     /* IDK */
 };

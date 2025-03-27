@@ -22,6 +22,9 @@ source = files(
     'src/logger.cpp',
     'src/utils.cpp',
     'src/tools.cpp',
+    'src/gtk_utils.cpp',
+    'src/volume/tab.cpp',
+    'src/volume/control.cpp',
 )
 
 deps = [

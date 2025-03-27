@@ -1,4 +1,4 @@
-#include "../inc/logger.hpp"
+#include "../include/logger.hpp"
 #include <cstring>
 #include <thread>
 

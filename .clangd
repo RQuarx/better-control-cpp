@@ -4,10 +4,10 @@ InlayHints:
 
 CompileFlags:
   Add: [
-    --std=c++23,
+    -std=c++23,
     -Xclang,
     -fixit,
-    -Iinc,
+    -Iinclude,
     -I/usr/include/gtkmm-3.0,
     -I/usr/lib/gtkmm-3.0/include,
     -I/usr/include/atkmm-1.6,

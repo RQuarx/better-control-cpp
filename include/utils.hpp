@@ -3,6 +3,7 @@
 #define UTILS_HPP_
 
 #include <filesystem>
+#include <vector>
 #include <string>
 
 
@@ -36,6 +37,8 @@ namespace Utils {
 
     /// Checks if current terminal used is able to use 16 or more colors
     auto term_has_colors() -> bool;
+
+    auto contains_substr(std::string_view src, std::string_view substr) -> bool;
 } /* namespace Utils */
 
 #endif /* utils.hpp */

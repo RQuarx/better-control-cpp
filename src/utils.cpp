@@ -1,4 +1,4 @@
-#include "../inc/utils.hpp"
+#include "../include/utils.hpp"
 
 #include <algorithm>
 #include <fstream>
@@ -7,12 +7,11 @@
 #include <iterator>
 
 #include <ncurses.h>
-
+#include <ranges>
 
 namespace Utils {
-    auto
-    get_current_time() -> std::string
-    {
+
+    auto get_current_time() -> std::string {
         auto now = std::chrono::system_clock::now();
         auto c_now = std::chrono::system_clock::to_time_t(now);
 
@@ -20,15 +19,11 @@ namespace Utils {
         localtime_r(&c_now, &tm_info);
 
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
-            now.time_since_epoch()
-        ) % MICROSECOND_UPPER_BOUND;
+                        now.time_since_epoch()) %
+                    MICROSECOND_UPPER_BOUND;
 
-        return std::format(
-            "{:02}:{:02}:{:03}",
-            tm_info.tm_min,
-            tm_info.tm_sec,
-            (ms.count() / MICROSECOND_TO_MILISECOND)
-        );
+        return std::format("{:02}:{:02}:{:03}", tm_info.tm_min, tm_info.tm_sec,
+                            (ms.count() / MICROSECOND_TO_MILISECOND));
     }
 
 
@@ -60,7 +55,7 @@ namespace Utils {
         std::string result;
 
         std::unique_ptr<FILE, decltype(&pclose)> pipe(
-            popen(std::string(cmd).c_str(), "r"), pclose
+            popen((std::string(cmd)  + " 2>&1").c_str(), "r"), pclose
         );
 
         if (!pipe) {
@@ -82,4 +77,17 @@ namespace Utils {
         }
         return false;
     }
-} /* namespace Utils */
+
+
+    auto
+    contains_substr(std::string_view src, std::string_view substr) -> bool
+    {
+        std::string lower_output{src};
+        std::ranges::transform(
+            lower_output, lower_output.begin(), [](char c) -> char {
+            return std::tolower(c);
+        });
+
+        return lower_output.contains(substr);
+    }
+    } /* namespace Utils */

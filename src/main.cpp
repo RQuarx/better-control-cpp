@@ -1,10 +1,9 @@
 #include <cstdlib>
 #include <cstdio>
 
-#include "../inc/arg_parse.hpp"
-#include "../inc/logger.hpp"
-#include "../inc/window.hpp"
-#include "../inc/tools.hpp"
+#include "../include/arg_parse.hpp"
+#include "../include/logger.hpp"
+#include "../include/window.hpp"
 
 
 auto
@@ -16,14 +15,14 @@ main(int32_t argc, char **argv) -> int32_t
         arg_parse.print_help_message(stdout);
     }
 
-    std::string option;
-    if (arg_parse.option_arg(option, { "-o", "--option" })) {
-        std::println("{}", option);
-    }
-
     Logger logger(&arg_parse);
 
-    // auto app = Gtk::Application::create(argc, argv, "org.void.better-control");
-    // BetterControl better_control("Control Centre", { 900, 600 });
-    // return app->run(better_control);
+    if (Utils::contains_substr(std::getenv("XDG_CURRENT_DESKTOP"), "hyprland")) {
+        std::system("hyprctl keyword windowrule float,class:'^(control)$'");
+    }
+
+    argc = 1;
+    auto app = Gtk::Application::create(argc, argv, "org.void.better-control");
+    BetterControl better_control(&logger, &arg_parse, "Control Centre", { 900, 600 });
+    return app->run(better_control);
 }

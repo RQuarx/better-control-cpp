@@ -1,4 +1,4 @@
-#include "../inc/arg_parse.hpp"
+#include "../include/arg_parse.hpp"
 
 #include <algorithm>
 #include <cstdio>
