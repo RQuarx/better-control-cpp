@@ -1,5 +1,4 @@
 #include "../inc/window.hpp"
-#include "gdkmm/rgba.h"
 
 
 BetterControl::BetterControl(
@@ -10,31 +9,27 @@ BetterControl::BetterControl(
     set_type_hint(Gdk::WINDOW_TYPE_HINT_DIALOG);
     set_default_size(window_size.first, window_size.second);
 
-    
+    Gtk::Box *main_box = Gtk::manage( new Gtk::Box(Gtk::Orientation::ORIENTATION_VERTICAL, 10) );
+    add(*main_box);
 
-    set_border_width(10);
+    Gtk::Notebook *tabs = Gtk::manage( new Gtk::Notebook() );
+    main_box->pack_start(*tabs, true, true, 0);
 
-    Gtk::Box *vbox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL, 5));
-    add(*vbox);
+    Gtk::Box *box1 = Gtk::manage( new Gtk::Box(Gtk::Orientation::ORIENTATION_HORIZONTAL, 10) );
+    Gdk::RGBA color("blue");
+    box1->override_background_color(color);
+    tabs->append_page(*box1);
 
-    for (size_t i = 0; i < 3; i++) {
-        Gtk::Box* hbox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_HORIZONTAL, 5));
-        vbox->pack_start(*hbox, Gtk::PACK_SHRINK);
+    Gtk::Box *box2 = Gtk::manage( new Gtk::Box(Gtk::Orientation::ORIENTATION_HORIZONTAL, 10) );
+    Gdk::RGBA color1("red");
+    box2->override_background_color(color);
+    tabs->append_page(*box2);
 
-        // Add labels inside each box to distinguish them
-        Gtk::Label* label = Gtk::manage(new Gtk::Label("Box " + std::to_string(i + 1)));
-        hbox->pack_start(*label, Gtk::PACK_SHRINK);
-
-        const Gdk::RGBA color("#00ffff");
-
-        hbox->override_background_color(color);
-    }
+    // g_signal_connect(tabs, "switch-page", G_CALLBACK(on_tab_switch), this);
 
     show_all_children();
 }
 
 
-BetterControl::~BetterControl()
-{
+BetterControl::~BetterControl() {}
 
-}
