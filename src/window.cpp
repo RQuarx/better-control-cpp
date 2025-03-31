@@ -17,12 +17,13 @@ BetterControl::BetterControl(
     add(*main_box);
 
     auto *tabs = Gtk::make_managed<Gtk::Notebook>();
+    tabs->set_tab_pos(Gtk::PositionType::POS_LEFT);
     main_box->pack_start(*tabs, true, true, 0);
 
     Volume::Control control(logger);
     auto *box1 = Gtk::make_managed<Volume::Tab>(logger, &control);
     // Gdk::RGBA color("blue");
-    tabs->add(*box1);
+    tabs->append_page(*box1, *GtkUtils::new_label_markup("Audio"));
 
     // g_signal_connect(tabs, "switch-page", G_CALLBACK(on_tab_switch), this);
 

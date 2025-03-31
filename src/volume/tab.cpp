@@ -1,10 +1,15 @@
 #include "../../include/gtk_utils.hpp"
-
 #include "../../include/volume.hpp"
+
+#include "gtkmm/comboboxtext.h"
+#include "gtkmm/button.h"
+#include "gtkmm/scale.h"
 
 #define OUT_SPACING 10
 #define OUT_MARGIN 15
 #define IN_SPACING 5
+
+#define NEW_ARR(x) { x, x, x, x }
 
 using Gtk::Box;
 using Gtk::ComboBoxText;
@@ -12,50 +17,61 @@ using Gtk::Label;
 using Volume::Tab;
 
 
-Tab::Tab(Logger *logger, Control *control) : control(control), logger(logger)
+Tab::Tab(Logger *logger, Control *control) :
+    tabs(Gtk::make_managed<Gtk::Notebook>()), control(control), logger(logger)
 {
     logger->log(Debug, "Initialising volume tab");
 
-    GtkUtils::set_margin(this, { OUT_MARGIN, OUT_MARGIN, OUT_MARGIN, OUT_MARGIN });
+    GtkUtils::set_margin(this, NEW_ARR(OUT_MARGIN));
     set_orientation(Gtk::ORIENTATION_VERTICAL);
     set_visible(true);
     set_spacing(OUT_SPACING);
 
+    widgets.insert({ "app-box", initialise_widget<Gtk::Box>() });
     widgets.insert({ "scale", initialise_widget<Gtk::Scale>() });
     widgets.insert({ "button", initialise_widget<Gtk::Button>() });
     widgets.insert({ "combo", initialise_widget<Gtk::ComboBoxText>() });
 
-    create_title();
-    create_main_box();
+    tabs->set_hexpand(false);
 
+    pack_start(*create_title_box(), false, false);
+
+    for (auto t : { create_system_audio_tab() }) {
+        tabs->append_page(*t.first, *t.second);
+    }
+
+    pack_start(*tabs);
     show_all();
 }
 
 
-void
-Tab::create_title()
+auto
+Tab::create_title_box() -> Box*
 {
-    Box *header_box = GtkUtils::new_box('h', IN_SPACING);
-    Box *title_box = GtkUtils::new_box('h', IN_SPACING);
+    Box *header_box = GtkUtils::new_box('h', 0);
+    Box *title_box = GtkUtils::new_box('h', 0);
+    auto *image = Gtk::make_managed<Gtk::Image>();
+    image->set_from_icon_name("audio-volume-high", Gtk::ICON_SIZE_LARGE_TOOLBAR);
+    image->set_pixel_size(50);
 
-    title_box->pack_start(*GtkUtils::new_image("audio-volume-high-symbolic"));
+    title_box->pack_start(*image);
     title_box->pack_start(
-        *GtkUtils::new_label_markup("<span weight='bold' size='large'>Audio Settings</span>")
+        *GtkUtils::new_label_markup("<span weight='bold' size='x-large'>Audio Settings</span>")
     );
 
     header_box->pack_start(*title_box, false, false, 0);
-    pack_start(*header_box, false, false, 0);
+    return header_box;
 }
 
 
-void
-Tab::create_main_box()
+auto
+Tab::create_system_audio_tab() -> std::pair<Gtk::ScrolledWindow*, Box*>
 {
     auto *main_scroll = Gtk::make_managed<Gtk::ScrolledWindow>();
     main_scroll->set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_AUTOMATIC);
 
     Box *content_box = GtkUtils::new_box('v', OUT_SPACING);
-    GtkUtils::set_margin(content_box, { OUT_SPACING, OUT_SPACING, OUT_SPACING, OUT_SPACING });
+    GtkUtils::set_margin(content_box, NEW_ARR(OUT_SPACING));
 
     for (Volume::Type t : { Output, Input }) {
         Label *section_label = GtkUtils::new_label_markup(std::format(
@@ -68,7 +84,17 @@ Tab::create_main_box()
         content_box->pack_start(*create_control_frame(t), false, true);
     }
 
-    pack_start(*content_box);
+    main_scroll->add(*content_box);
+
+    Box *tab_label = GtkUtils::new_box('h', IN_SPACING);
+    auto *tab_label_image = Gtk::make_managed<Gtk::Image>();
+    tab_label_image->set_from_icon_name("audio-volume-high", Gtk::ICON_SIZE_MENU);
+    tab_label->pack_start(*tab_label_image);
+    tab_label->pack_start(*GtkUtils::new_label_markup("<span size='large'>System</span>"));
+    tab_label->set_tooltip_text("System audio settings");
+    tab_label->show_all();
+
+    return { main_scroll, tab_label };
 }
 
 
@@ -97,7 +123,7 @@ Tab::create_control_frame(Volume::Type type) -> Gtk::Frame*
     frame->set_margin_top(OUT_SPACING);
 
     Box *volume_box = GtkUtils::new_box('v', IN_SPACING);
-    GtkUtils::set_margin(volume_box, { OUT_SPACING, OUT_SPACING, OUT_SPACING, OUT_SPACING });
+    GtkUtils::set_margin(volume_box, NEW_ARR(OUT_SPACING));
 
     /* ? Label */
     Label *title = GtkUtils::new_label_markup(std::format(
@@ -112,6 +138,7 @@ Tab::create_control_frame(Volume::Type type) -> Gtk::Frame*
     scale->set_increments(1, 2);
     scale->set_value(control->get_volume(type));
     scale->set_digits(0);
+    scale->set_margin_right(OUT_SPACING);
     scale->signal_value_changed().connect(sigc::bind(
         sigc::mem_fun(*this, &Tab::on_volume_change), type
     ));
@@ -144,6 +171,34 @@ Tab::create_control_frame(Volume::Type type) -> Gtk::Frame*
 }
 
 
+auto
+Tab::create_app_control_box(Volume::Type type) -> Box*
+{
+    Box* content_box = GtkUtils::new_box('v', OUT_SPACING);
+
+    Label* label = GtkUtils::new_label_markup(std::format(
+        "<b>Applications {} Volume</b>", type_str.at(type)
+    ));
+    label->set_halign(Gtk::ALIGN_START);
+    label->set_margin_top(OUT_MARGIN);
+
+    auto *frame = Gtk::make_managed<Gtk::Frame>();
+    frame->set_shadow_type(Gtk::SHADOW_IN);
+    frame->set_margin_top(IN_SPACING);
+
+    Box* app_box = dynamic_cast<Box*>(widgets.at("app-box").at(type));
+    app_box->set_orientation(Gtk::ORIENTATION_VERTICAL);
+    app_box->set_spacing(IN_SPACING);
+    GtkUtils::set_margin(app_box, NEW_ARR(OUT_SPACING));
+
+    content_box->pack_start(*label);
+    frame->add(*app_box);
+    content_box->pack_start(*frame, true, true);
+
+    return content_box;
+}
+
+
 void
 Tab::on_device_change(Volume::Type type)
 {
@@ -161,7 +216,7 @@ Tab::on_mute_click(Volume::Type type)
 {
     if (type == All) return;
     control->toggle_mute(type);
-    update_mute_buttons(All);
+    update_mute_buttons(type);
 }
 
 
@@ -192,31 +247,16 @@ Tab::on_quick_volume_click(Volume::Type type, int32_t volume)
 auto
 Tab::update_mute_buttons(Volume::Type type) -> bool
 {
-    static const std::array<std::pair<std::string, std::string>, 2> info = {
-        {
-            { "audio-volume-muted-symbolic", "Unmute {}" },
-            { "audio-volume-high-symbolic", "Mute {}" }
-        }
-    };
+    if (type == All) return false;
 
     uint8_t index = (control->is_muted(type) ? 0 : 1);
-    if (type != All) {
-        Gtk::Button *mute_button = dynamic_cast<Gtk::Button*>(widgets.at("button").at(type));
+    if (icons.find(type) == icons.end()) return false;
 
-        mute_button->set_tooltip_text(std::vformat(
-            info.at(index).second, std::make_format_args(type_str.at(type))
-        ));
-        mute_button->set_image_from_icon_name(info.at(index).first);
-        return true;
-    }
+    Gtk::Button *mute_button = dynamic_cast<Gtk::Button*>(widgets.at("button").at(type));
 
-    for (Volume::Type t : { Input, Output }) {
-        Gtk::Button *mute_button = dynamic_cast<Gtk::Button*>(widgets.at("button").at(t));
-
-        std::string_view fmt = info.at(index).second;
-        mute_button->set_tooltip_text(std::vformat(fmt, std::make_format_args(type_str.at(t))));
-        mute_button->set_image_from_icon_name(info.at(index).first);
-    }
-
+    mute_button->set_tooltip_text(std::vformat(
+        icons.at(type).at(index).second, std::make_format_args(type_str.at(type))
+    ));
+    mute_button->set_image_from_icon_name(icons.at(type).at(index).first);
     return true;
 }

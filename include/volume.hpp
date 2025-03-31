@@ -2,13 +2,15 @@
 #ifndef VOLUME_HPP_
 #define VOLUME_HPP_
 
-#include <gtkmm-3.0/gtkmm/comboboxtext.h>
-#include <gtkmm-3.0/gtkmm/button.h>
-#include <gtkmm-3.0/gtkmm/frame.h>
-#include <gtkmm-3.0/gtkmm/scale.h>
-#include <gtkmm-3.0/gtkmm/box.h>
+#include "gtkmm/scrolledwindow.h"
+#include "gtkmm/notebook.h"
+#include "gtkmm/frame.h"
+#include "gtkmm/box.h"
 
 #include "logger.hpp"
+
+using string_view_pair = std::pair<std::string_view, std::string_view>;
+using string_pair = std::pair<std::string, std::string>;
 
 
 namespace Volume {
@@ -37,7 +39,7 @@ namespace Volume {
         auto toggle_mute(Type type) -> bool;
     private:
         Logger *logger{};
-        static inline std::unordered_map<Type, std::pair<std::string, std::string>> type_module = {
+        static inline std::unordered_map<Type, string_view_pair> type_module = {
             { Input, { "source", "@DEFAULT_SOURCE@" } },
             { Output, { "sink", "@DEFAULT_SINK@" } }
         };
@@ -51,6 +53,11 @@ namespace Volume {
 
     private:
         std::unordered_map<std::string, std::array<Gtk::Widget*, 2>> widgets;
+        static inline std::unordered_map<Volume::Type, std::array<string_pair, 2>> icons = {
+            { Output, {{ { "audio-volume-muted", "Unmute Output" }, { "audio-volume-high", "Mute Output" } }} },
+            { Input, {{ { "microphone-sensitivity-muted", "Unmute Input" }, { "microphone-sensitivity-high", "Mute Input" } }} }
+        };
+        Gtk::Notebook *tabs;
         Control *control;
         Logger *logger;
 
@@ -65,10 +72,11 @@ namespace Volume {
         auto initialise_widget() -> std::array<Gtk::Widget*, 2>
         { return { Gtk::make_managed<WidgetType>(), Gtk::make_managed<WidgetType>() }; }
 
-        auto create_control_frame(Type type) -> Gtk::Frame*;
         auto create_box(Type type) -> Gtk::Box*;
-        void create_title();
-        void create_main_box();
+        auto create_title_box() -> Gtk::Box*;
+        auto create_system_audio_tab() -> std::pair<Gtk::ScrolledWindow*, Gtk::Box*>;
+        auto create_control_frame(Type type) -> Gtk::Frame*;
+        auto create_app_control_box(Type type) -> Gtk::Box*;
     };
 } /* namespace Volume */
 

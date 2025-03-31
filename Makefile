@@ -1,26 +1,29 @@
 CXX = clang++
+CXX_LD = lld
 
-TARGET_DIR = target
+BuildDir = target
 
-PREFIX ?= /usr
-INSTALL_DIR = $(PREFIX)/share/applications
-BIN_DIR = $(PREFIX)/bin
+Prefix ?= /usr
+InstallDir = $(Prefix)/share/applications
+BinDir = $(Prefix)/bin
 
 all:
 	@echo "Run 'make build' and 'make install' to install BetterControl"
 
 build:
-	@rm -rf $(TARGET_DIR)
-	@CXX=$(CXX) meson setup $(TARGET_DIR)
-	@meson compile -C $(TARGET_DIR)
+	if [ ! -d "$(BuildDir)" ]; then \
+		CXX=$(CXX) CXX_LD=$(CXX_LD) meson setup $(BuildDir); \
+	fi
+
+	@meson compile -C $(BuildDir)
 
 install: build
-	@cp $(TARGET_DIR)/control $(BIN_DIR)
-	@cp control.desktop $(INSTALL_DIR)
+	@cp $(BuildDir)/control $(BinDir)
+	@cp control.desktop $(InstallDir)
 
 clean:
-	@rm -rf $(TARGET_DIR)
-	@rm -f $(BIN_DIR)/control
-	@rm 0f $(INSTALL_DIR)/control.desktop
+	@rm -rf $(BuildDir)
+	@rm -f $(BinDir)/control
+	@rm 0f $(InstallDir)/control.desktop
 
 .PHONY: all build install clean
