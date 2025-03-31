@@ -21,7 +21,6 @@ source = files(
     'src/window.cpp',
     'src/logger.cpp',
     'src/utils.cpp',
-    'src/tools.cpp',
     'src/gtk_utils.cpp',
     'src/volume/tab.cpp',
     'src/volume/control.cpp',
@@ -34,7 +33,7 @@ deps = [
 executable(
     'control',
     source,
-    include_directories: include_directories('inc'),
+    include_directories: include_directories('include'),
     cpp_args: compile_flags,
     dependencies: deps
 )

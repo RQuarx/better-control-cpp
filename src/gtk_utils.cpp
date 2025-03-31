@@ -21,12 +21,12 @@ namespace GtkUtils {
     }
 
     void
-    set_margin(Gtk::Widget &w, std::array<int32_t, 4> sides)
+    set_margin(Gtk::Widget *w, std::array<int32_t, 4> sides)
     {
-        w.set_margin_top(sides.at(0));
-        w.set_margin_right(sides.at(1));
-        w.set_margin_bottom(sides.at(2));
-        w.set_margin_left(sides.at(3));
+        w->set_margin_top(sides.at(0));
+        w->set_margin_right(sides.at(1));
+        w->set_margin_bottom(sides.at(2));
+        w->set_margin_left(sides.at(3));
     }
 
     auto

@@ -7,6 +7,11 @@
 #include <vector>
 #include <array>
 
+#define HELP_MSG \
+"Help Options:\n" \
+"  -h, --help                 Show help options\n" \
+"  -l, --log <lvl/file>       A log option that accepts a path to a log file or a log-level (0-3)\n"
+
 
 class
 ArgParser

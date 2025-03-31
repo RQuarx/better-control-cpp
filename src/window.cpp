@@ -20,7 +20,7 @@ BetterControl::BetterControl(
     main_box->pack_start(*tabs, true, true, 0);
 
     Volume::Control control(logger);
-    auto *box1 = Gtk::make_managed<Volume::Tab>(logger, arg_parse, &control);
+    auto *box1 = Gtk::make_managed<Volume::Tab>(logger, &control);
     // Gdk::RGBA color("blue");
     tabs->add(*box1);
 

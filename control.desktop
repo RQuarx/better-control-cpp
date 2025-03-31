@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Better Control
+GenericName=Better Control
+Comment=Fast & feature-rich control center
+TryExec=better-control
+StartupNotify=true
+Exec=/usr/bin/control
+Icon=settings
+Categories=System;Control;Settings;

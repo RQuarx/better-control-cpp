@@ -21,8 +21,8 @@ main(int32_t argc, char **argv) -> int32_t
         std::system("hyprctl keyword windowrule float,class:'^(control)$'");
     }
 
-    argc = 1;
-    auto app = Gtk::Application::create(argc, argv, "org.void.better-control");
+    argc = 0;
+    auto app = Gtk::Application::create("org.void.better-control");
     BetterControl better_control(&logger, &arg_parse, "Control Centre", { 900, 600 });
-    return app->run(better_control);
+    return app->run(better_control, argc, argv);
 }

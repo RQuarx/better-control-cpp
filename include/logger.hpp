@@ -48,6 +48,7 @@ public:
 
         if (log_level >= log_threshold) {
             std::println("{} {} {}", Utils::get_current_time(), label, message);
+            std::fflush(stdout);
         }
     }
 

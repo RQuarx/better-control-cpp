@@ -12,7 +12,7 @@ namespace GtkUtils {
 
     auto new_image(const std::string &icon_name, Gtk::BuiltinIconSize icon_size = Gtk::ICON_SIZE_DIALOG) -> Gtk::Image*;
 
-    void set_margin(Gtk::Widget &w, std::array<int32_t, 4> sides);
+    void set_margin(Gtk::Widget *w, std::array<int32_t, 4> sides);
 
     auto new_label_markup(const std::string &markup) -> Gtk::Label*;
 } /* namespace GtkUtils */

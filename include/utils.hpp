@@ -39,6 +39,8 @@ namespace Utils {
     auto term_has_colors() -> bool;
 
     auto contains_substr(std::string_view src, std::string_view substr) -> bool;
+
+    auto str_tolower(std::string_view) -> std::string;
 } /* namespace Utils */
 
 #endif /* utils.hpp */

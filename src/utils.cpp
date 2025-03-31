@@ -80,14 +80,20 @@ namespace Utils {
 
 
     auto
-    contains_substr(std::string_view src, std::string_view substr) -> bool
+    str_tolower(std::string_view str) -> std::string
     {
-        std::string lower_output{src};
+        std::string out(str);
         std::ranges::transform(
-            lower_output, lower_output.begin(), [](char c) -> char {
+            out, out.begin(), [](char c) -> char {
             return std::tolower(c);
         });
+        return out;
+    }
 
-        return lower_output.contains(substr);
+
+    auto
+    contains_substr(std::string_view src, std::string_view substr) -> bool
+    {
+        return str_tolower(src).contains(substr);
     }
     } /* namespace Utils */

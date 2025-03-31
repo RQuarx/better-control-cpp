@@ -12,51 +12,63 @@
 
 
 namespace Volume {
+    enum Type : uint8_t {
+        Input = 0,
+        Output = 1,
+        All = 2
+    };
+
+    static inline const std::unordered_map<Type, std::string_view> type_str = {
+        { Input, "Input" },
+        { Output, "Output" },
+        { All, "All" }
+    };
+
+
     class Control
     {
     public:
         explicit Control(Logger *logger) : logger(logger) {}
 
-        void add_logger(Logger *logger);
-
-        /// Fetch the volume from pactl
-        /// @returns a range between 0-100 or a -1 on error
-        auto get_volume() -> int32_t;
-
-        void set_volume(int32_t volume);
-
-        auto set_default_sink(const std::string &sink_name) -> bool;
-
-        auto is_muted() -> bool;
+        auto get_volume(Type type) -> int32_t;
+        void set_volume(Type type, int32_t volume);
+        auto set_default(Type type, const std::string &name) -> bool;
+        auto is_muted(Type type) -> bool;
+        auto toggle_mute(Type type) -> bool;
     private:
         Logger *logger{};
+        static inline std::unordered_map<Type, std::pair<std::string, std::string>> type_module = {
+            { Input, { "source", "@DEFAULT_SOURCE@" } },
+            { Output, { "sink", "@DEFAULT_SINK@" } }
+        };
     };
 
 
     class Tab : public Gtk::Box
     {
     public:
-        Tab(Logger *logger, ArgParser *arg_parser, Control *control);
+        Tab(Logger *logger, Control *control);
 
     private:
-        Gtk::Scale *volume_scale{};
-        Gtk::Button *mute_button{};
-        Gtk::ComboBoxText *output_combo{};
-        Control *control{};
+        std::unordered_map<std::string, std::array<Gtk::Widget*, 2>> widgets;
+        Control *control;
         Logger *logger;
 
-        std::array<uint8_t, 5> quick_access_volume{ 0, 25, 50, 75, 100 };
-
     protected:
-        auto update_mute_button() -> bool;
-        void on_output_change();
-        void on_volume_change();
-        void on_quick_volume_click(int32_t volume);
+        void on_volume_change(Type type);
+        void on_quick_volume_click(Type type, int32_t volume);
+        void on_mute_click(Type type);
+        auto update_mute_buttons(Type type) -> bool;
+        void on_device_change(Type type);
 
+        template<typename WidgetType>
+        auto initialise_widget() -> std::array<Gtk::Widget*, 2>
+        { return { Gtk::make_managed<WidgetType>(), Gtk::make_managed<WidgetType>() }; }
+
+        auto create_control_frame(Type type) -> Gtk::Frame*;
+        auto create_box(Type type) -> Gtk::Box*;
         void create_title();
         void create_main_box();
-        auto create_output_box() -> Gtk::Box*;
-        auto create_volume_control_box() -> Gtk::Frame*;
     };
 } /* namespace Volume */
 

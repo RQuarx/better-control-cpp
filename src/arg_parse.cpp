@@ -65,15 +65,6 @@ ArgParser::option_arg(std::string &option, std::pair<std::string_view, std::stri
 }
 
 
-void
-ArgParser::print_help_message(FILE *stream)
-{
-    std::println(stream, "Usage: {} <options>\n", bin_path);
-    std::println(stream, "Options:");
-    exit(stream == stderr ? EXIT_FAILURE : EXIT_SUCCESS);
-}
-
-
 auto
 ArgParser::find_option_short(std::string &option, std::string_view short_arg) -> bool
 {
@@ -153,4 +144,13 @@ ArgParser::find_option_long(std::string &option, std::string_view long_arg) -> b
 
     option.clear();
     return false;
+}
+
+
+void
+ArgParser::print_help_message(FILE *stream)
+{
+    std::println("Usage: {}\n", bin_path);
+    std::println(stream, HELP_MSG);
+    exit(stream == stderr ? EXIT_FAILURE : EXIT_SUCCESS);
 }
