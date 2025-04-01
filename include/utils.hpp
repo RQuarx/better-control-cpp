@@ -41,6 +41,8 @@ namespace Utils {
     auto contains_substr(std::string_view src, std::string_view substr) -> bool;
 
     auto str_tolower(std::string_view) -> std::string;
+    auto str_toupper(std::string_view) -> std::string;
+    auto str_trim(std::string_view str) -> std::string;
 } /* namespace Utils */
 
 #endif /* utils.hpp */

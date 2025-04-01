@@ -96,4 +96,38 @@ namespace Utils {
     {
         return str_tolower(src).contains(substr);
     }
-    } /* namespace Utils */
+
+
+    auto
+    str_toupper(std::string_view str) -> std::string
+    {
+        std::string out(str);
+        out.at(0) = std::toupper(out.at(0));
+        return out;
+    }
+
+
+    auto
+    str_trim(std::string_view str) -> std::string
+    {
+        std::string output(str);
+
+        output.erase(
+            output.begin(),
+            std::ranges::find_if(
+                output,
+                [](char c) { return !std::isspace(c); }
+            )
+        );
+        output.erase(
+            std::ranges::find_if(
+                output.rbegin(),
+                output.rend(),
+                [](char c) { return !std::isspace(c); }
+            ).base(),
+            output.end()
+        );
+
+        return output;
+    }
+} /* namespace Utils */

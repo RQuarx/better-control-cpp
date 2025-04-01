@@ -20,6 +20,12 @@ BetterControl::BetterControl(
     tabs->set_tab_pos(Gtk::PositionType::POS_LEFT);
     main_box->pack_start(*tabs, true, true, 0);
 
+    auto *settings_button = Gtk::make_managed<Gtk::Button>();
+    settings_button->set_image(*GtkUtils::new_image("emblem-system-symbolic", Gtk::ICON_SIZE_BUTTON));
+
+    settings_button->show_all();
+    tabs->set_action_widget(settings_button, Gtk::PACK_END);
+
     Volume::Control control(logger);
     auto *box1 = Gtk::make_managed<Volume::Tab>(logger, &control);
     // Gdk::RGBA color("blue");
